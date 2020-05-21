@@ -5,8 +5,9 @@ namespace Tungsten\SkillAnimate\SkillContainer;
 
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use Tungsten\SkillAnimate\DelayedTask\destroyBlockTask;
-use Tungsten\SkillAnimate\DelayedTask\spawnBlockTask;
+use Tungsten\SkillAnimate\AnimateController\destroyBlockTask;
+use Tungsten\SkillAnimate\AnimateController\spawnBlockDelayedTask;
+use Tungsten\SkillAnimate\RepeatingTask\blockPersonalTask;
 use Tungsten\SkillAnimate\SkillAnimate;
 
 
@@ -24,7 +25,6 @@ class GaraProtection
         $level = $player->getLevel();
         //dong 0 nam 1  bac 3 tay 2
         $direc = $player->getDirection();
-        var_dump($direc);
 
         $tick = 2;
         $destroytime = 5 * 20;
@@ -55,42 +55,47 @@ class GaraProtection
                                 continue;
                             }
                         }
-                        //dong 0 nam 1  bac 3 tay 2
-                        $tempX = $x;
-                        $tempZ = $z;
-                        if ($direc == 1) {
-                            $c = $tempX;
-                            $tempX = $tempZ;
-                            $tempZ = $c;
-                        } else if ($direc == 2) {
-                            $tempX = -$tempX;
-                        } else if ($direc == 3) {
-                            $c = $tempX;
-                            $tempX = $tempZ;
-                            $tempZ = -$c;
-                        } else {
-                            //works good
+
+                        $position = $this->PosCorrection($direc,$pos,$x,$y,$z);
+
+                        if($level->getBlock($position)->getId() == 0){
+                            $task = new blockPersonalTask($sa,$player,$position,$level,"GaraProtection", $destroytime);
+                            $sa->getScheduler()->scheduleRepeatingTask($task,1);
                         }
+
                         if (rand(0, 3) != 0) {
                             $blockData = [24, 15];
-                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData, "dig.sand"), $tick);
-                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData, "dig.sand"), $tick + $destroytime);
+                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData, "dig.sand"), $tick);
+                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "dig.sand"), $tick + $destroytime);
                         } else {
                             $blockData = [20, 15];
-                            if (rand(0, 5) == 0) {
+                            if (rand(0, 4) == 0) {
                                 $tick += 1;
-                                $sa->getScheduler()->scheduleDelayedTask(new spawnBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData, "random.glass"), $tick);
-                                $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData, "random.glass"), $tick + $destroytime);
+                            }
+                            if(rand(0,10) == 0){
+                                $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData, "random.glass"), $tick);
+                                $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "random.glass"), $tick + $destroytime);
                                 continue;
                             }
-                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData), $tick);
-                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($pos->add($tempX, $y, $tempZ), $level, $blockData), $tick + $destroytime);
+                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData), $tick);
+                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData), $tick + $destroytime);
 
                         }
 
                     }
                 }
             }
+        }
+    }
+    public function PosCorrection(int $direc,Vector3 $pos,int $x ,int $y, int $z) : Vector3{
+        if ($direc == 0) {
+            return $pos->add($x,$y,$z);
+        } else if ($direc == 1) {
+            return $pos->add($z,$y,$x);
+        } else if ($direc == 2) {
+            return $pos->add(-$x,$y,$z);
+        } else {
+            return $pos->add($z,$y,-$x);
         }
     }
 }
