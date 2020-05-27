@@ -8,6 +8,8 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 
+use pocketmine\event\player\PlayerQuitEvent;
+use Tungsten\SkillAnimate\Events\ChakraGenerateEvent;
 use Tungsten\SkillAnimate\Events\SkillExecuteEvent;
 use Tungsten\SkillAnimate\SkillAnimate;
 
@@ -32,16 +34,18 @@ class MainEventListener implements Listener
         if ($ev->getItem()->getId() == 501) {
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillExecuteEvent($this->sa,$player,"GroundBadabum"));
         }
+        if ($ev->getItem()->getId() == 502) {
+            $this->sa->getServer()->getPluginManager()->callEvent(new SkillExecuteEvent($this->sa,$player,"SoulHand"));
+        }
 
     }
     public function onJoin(PlayerJoinEvent $ev){
         $player = $ev->getPlayer();
-        if($player->namedtag->hasTag("Chakra",FloatTag::class)) return;
-        $nbt1 = new FloatTag("Chakra",300);
-        $nbt2 = new IntTag("maxChakra",300);
-        $nbt3 = new FloatTag("ChakraHealPerSec",5);
-        $player->namedtag->setTag($nbt1);
-        $player->namedtag->setTag($nbt2);
-        $player->namedtag->setTag($nbt3);
+        $this->sa->getServer()->getPluginManager()->callEvent(new ChakraGenerateEvent($this->sa,$player));
     }
+    public function onQuit(PlayerQuitEvent $ev){
+        $player = $ev->getPlayer();
+        $this->sa->database->saveConfig($player);
+    }
+
 }

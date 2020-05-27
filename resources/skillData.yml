@@ -1,0 +1,15 @@
+GaraProtection:
+  destroyTime: 100
+  distance: 1
+  radius: 5
+  effect: 1
+GroundBadabum:
+  distance: 30
+  width: 4
+  destroyTime: 100
+  damage: 1
+SoulHand:
+  endTime: 200
+  oneRoundSpeed: 40
+  damage: 2
+  effect: 1

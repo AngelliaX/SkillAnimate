@@ -42,17 +42,18 @@ class showingChakraTask extends Task implements Listener
     {
         foreach ($this->list as $player) {
             if ($player instanceof Player) {
-                $Chakra = $player->namedtag->getFloat("Chakra");
-                $maxChakra = $player->namedtag->getInt("maxChakra");
+                $config = $this->sa->database->getConfig($player);
+                $Chakra = $config->getNested("Chakra");
+                $maxChakra = $config->getNested("maxChakra");
                 #$player->sendTip("§bChakra: §a".round($Chakra,0)."§e/§a" . "$maxChakra");
-                $addChak = $player->namedtag->getFloat("ChakraHealPerSec");
+                $addChak = $config->getNested("ChakraHealPerSec");
                 if ($Chakra < $maxChakra) {
                     if($Chakra + $addChak >= $maxChakra){
-                        $player->namedtag->setFloat("Chakra", $maxChakra);
+                        $config->setNested("Chakra", $maxChakra);
                     }else{
-                        $player->namedtag->setFloat("Chakra", $Chakra + $addChak);
+                        $config->setNested("Chakra", $Chakra + $addChak);
                     }
-                    $Chakra = $player->namedtag->getFloat("Chakra");
+                    $Chakra = $config->getNested("Chakra");
                     $player->sendTip("§bChakra: §a".round($Chakra,0)."§e/§a" . "$maxChakra");
                     $this->playMusic($player, "random.levelup");
                 }

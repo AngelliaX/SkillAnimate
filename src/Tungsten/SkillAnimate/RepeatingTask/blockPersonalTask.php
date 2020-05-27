@@ -25,8 +25,8 @@ class blockPersonalTask extends Task
     public $endTime;
 
     private $time = 0;
-
-    public function __construct(SkillAnimate $sa, Player $skillOwner, Vector3 $pos, Level $level, string $skillName, int $endtime)
+    private $distance;
+    public function __construct(SkillAnimate $sa, Player $skillOwner, Vector3 $pos, Level $level, string $skillName, int $endtime,int $distance = 1)
     {
         $this->sa = $sa;
         $this->skillOwner = $skillOwner;
@@ -34,6 +34,7 @@ class blockPersonalTask extends Task
         $this->level = $level;
         $this->skillName = $skillName;
         $this->endTime = $endtime;
+        $this->distance = $distance;
         #var_dump("class called");
     }
 
@@ -46,17 +47,17 @@ class blockPersonalTask extends Task
             return;
         }
         foreach($this->level->getPlayers() as $player){
-            if($player->x < $this->pos->x -1 or $player->x > $this->pos->x +1){
+            if($player->x < $this->pos->x -$this->distance or $player->x > $this->pos->x +$this->distance){
                 continue;
             }
-            if($player->y < $this->pos->y -1 or $player->y > $this->pos->y +1){
+            if($player->y < $this->pos->y -$this->distance or $player->y > $this->pos->y +$this->distance){
                 continue;
             }
-            if($player->z < $this->pos->z -1 or $player->z > $this->pos->z +1){
+            if($player->z < $this->pos->z -$this->distance or $player->z > $this->pos->z +$this->distance){
                 continue;
             }
             if($player->getName() == $this->skillOwner->getName()){
-                #continue;
+                continue;
             }
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillCollideEvent($this->sa,$this->skillOwner,$player,$this->skillName));
         }

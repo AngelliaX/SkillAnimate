@@ -9,6 +9,7 @@ use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
+use Tungsten\SkillAnimate\RepeatingTask\blockPersonalTask;
 use Tungsten\SkillAnimate\SkillAnimate;
 class spawnBlockDelayedTask extends Task
 {
@@ -24,13 +25,22 @@ class spawnBlockDelayedTask extends Task
     private $sound;
     /** @var int  */
     private $distance = 100;
+
+    private $player;
+    private $skillName;
+    private $destroyTime;
+    private $distanceForPersonalBlock;
     //SkillAnimate $sa, Player $player, Vector3 $pos, Level $level, string $skillName, int $endtime
-    public function __construct(Vector3 $pos, Level $level, array $blockData,string $sound = null)
+    public function __construct(Vector3 $pos, Level $level, array $blockData,Player $player,string $skillName,int $destroyTime,string $sound = null,int $distance = 1)
     {
         $this->pos = $pos;
         $this->level = $level;
         $this->blockData = $blockData;
         $this->sound = $sound;
+        $this->player = $player;
+        $this->skillName = $skillName;
+        $this->destroyTime = $destroyTime;
+        $this->distanceForPersonalBlock =  $distance;
     }
 
 
@@ -39,7 +49,10 @@ class spawnBlockDelayedTask extends Task
         if($this->level->getBlock($this->pos)->getId() != 0){
             return;
         }
+        $sa = SkillAnimate::$instance;
 
+        $task = new blockPersonalTask($sa, $this->player, $this->pos, $this->level, $this->skillName, $this->destroyTime,$this->distanceForPersonalBlock);
+        $sa->getScheduler()->scheduleRepeatingTask($task, 1);
         $this->level->setBlock($this->pos,Block::get($this->blockData[0],$this->blockData[1]),false,false);
 
         if($this->sound != null){
@@ -60,4 +73,5 @@ class spawnBlockDelayedTask extends Task
 
         }
     }
+
 }

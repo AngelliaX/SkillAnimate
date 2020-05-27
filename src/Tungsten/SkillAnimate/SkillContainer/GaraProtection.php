@@ -13,9 +13,22 @@ use Tungsten\SkillAnimate\SkillAnimate;
 
 class GaraProtection
 {
-
-    public function __construct(SkillAnimate $sa, Player $player)
+    private $destroyTime;
+    private $distance;
+    private $radius;
+    public function __construct(SkillAnimate $sa, Player $player,int $destroyTime = null,int $distance = null,int $radius = null)
     {
+
+        if(!is_null($config = $sa->database->getConfig($player)->getNested("GaraProtection"))){
+            $this->destroyTime = $config["destroyTime"];
+            $this->distance = $config["distance"];
+            $this->radius = $config["radius"];
+        }else{
+            $config = $sa->skillData->getNested("GaraProtection");
+            $this->destroyTime = $config["destroyTime"];
+            $this->distance = $config["distance"];
+            $this->radius = $config["radius"];
+        }
         $this->spawnBlock($sa, $player);
     }
 
@@ -27,14 +40,12 @@ class GaraProtection
         $direc = $player->getDirection();
 
         $tick = 2;
-        $destroytime = 5 * 20;
-
-        $maxX = 6;
-        $maxY = 6;
-        $maxZ = 6;
-        $minX = -6;
-        $minY = -6;
-        $minZ = -6;
+        $maxX = $this->radius;
+        $maxY = $this->radius;
+        $maxZ = $this->radius;
+        $minX = -$this->radius;
+        $minY = -$this->radius;
+        $minZ = -$this->radius;
         $radiusX = ($maxX - $minX) / 2;
         $radiusY = ($maxY - $minY) / 2;
         $radiusZ = ($maxZ - $minZ) / 2;
@@ -51,34 +62,33 @@ class GaraProtection
                     $zs = ($z - $centerZ) ** 2 / $radiusZ ** 2;
                     if ($xs + $ys + $zs <= 1.0) {
                         if (true) {
-                            if ($xs + $ys + $zs < 0.7) {
+                            if ($xs + $ys + $zs < 0.65) {
                                 continue;
                             }
                         }
-
+                        if($y == 1){
+                            if(rand(0,2) != 0){
+                                continue;
+                            }
+                        }
                         $position = $this->PosCorrection($direc,$pos,$x,$y,$z);
 
-                        if($level->getBlock($position)->getId() == 0){
-                            $task = new blockPersonalTask($sa,$player,$position,$level,"GaraProtection", $destroytime);
-                            $sa->getScheduler()->scheduleRepeatingTask($task,1);
-                        }
-
                         if (rand(0, 3) != 0) {
-                            $blockData = [24, 15];
-                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData, "dig.sand"), $tick);
-                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "dig.sand"), $tick + $destroytime);
+                            $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
+                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData,$player,"GaraProtection",$this->destroyTime, "dig.sand",$this->distance), $tick);
+                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "dig.sand"), $tick + $this->destroyTime);
                         } else {
                             $blockData = [20, 15];
                             if (rand(0, 4) == 0) {
                                 $tick += 1;
                             }
                             if(rand(0,10) == 0){
-                                $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData, "random.glass"), $tick);
-                                $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "random.glass"), $tick + $destroytime);
+                                $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData,$player,"GaraProtection",$this->destroyTime, "random.glass",$this->distance), $tick);
+                                $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "random.glass"), $tick + $this->destroyTime);
                                 continue;
                             }
-                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData), $tick);
-                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData), $tick + $destroytime);
+                            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData,$player,"GaraProtection",$this->destroyTime,"",$this->distance), $tick);
+                            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData), $tick + $this->destroyTime);
 
                         }
 

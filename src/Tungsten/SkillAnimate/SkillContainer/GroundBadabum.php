@@ -13,30 +13,99 @@ use Tungsten\SkillAnimate\SkillAnimate;
 
 class GroundBadabum
 {
-    public $distance = 30;
-    public $width = 5;
-    private $damage = 3;
-    public $destroytime = 5*20;
-    public function __construct(SkillAnimate $sa, Player $player,array $customData = null)
+    public $distance;
+    public $width;
+    public $destroytime;
+    public function __construct(SkillAnimate $sa, Player $player)
     {
-        //TODO lam phan customdata (moi player co the dung skill vs distanct khac nhau,v.v
-        if($customData != null){
-            $this->distance = $customData[0];
-            $this->width = $customData[1];
-            $this->damage = $customData [2];
+        if(!is_null($config = $sa->database->getConfig($player)->getNested("GroundBadabum"))){
+            $this->destroytime = $config["destroyTime"];
+            $this->distance = $config["distance"];
+            $this->width = $config["width"];
+        }else{
+            $config = $sa->skillData->getNested("GroundBadabum");
+            $this->destroytime = $config["destroyTime"];
+            $this->distance = $config["distance"];
+            $this->width = $config["width"];
         }
         $this->spawnBlock($sa, $player);
     }
 
     public function spawnBlock(SkillAnimate $sa, Player $player): void
     {
-        $pos = new Vector3($player->getX(), $player->getY(), $player->getZ());
         $level = $player->getLevel();
         //dong 0 nam 1  bac 3 tay 2
         $direc = $player->getDirection();
 
         $tick = 2;
 
+        $pos = $player;
+        $pos = $this->PosCorrection($direc,$pos,2,0,0);
+        $unitVector = $player->getDirectionVector();
+        $unitVector->setComponents($unitVector->x,0,$unitVector->z);
+        $tempZ = -1;
+        for($i = 0; $i <= $this->distance; $i++){
+            if($i < $this->width +2){
+                $tempZ++;
+            }
+            if($i > $this->width +3 and $i < $this->distance - $this->width){
+                if($tempZ >= $this->width){
+                    $tempZ--;
+                }else{
+                    $tempZ++;
+                }
+            }
+            if($i >= $this->distance - $this->width){
+                $tempZ--;
+            }
+            $pos = $pos->add($unitVector);
+
+            $position = 0;
+            if(rand(0,10) == 0){
+                $position = $pos->add(0,1,0);
+            }else{
+                $position = $pos;
+            }
+
+            if(rand(0,15) == 0){
+                $position = $position->add($unitVector);
+            }
+            $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
+
+            $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData,$player,"GroundBadabum",$this->destroytime,"dig.grass"), $tick);
+            $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+            $position = $pos;
+            for ($z = 0; $z <= $tempZ; $z++) {
+                $position = $pos;
+                if(rand(0,3) == 0){$tick +=1;}
+                $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
+                if($direc == 0 or $direc == 2){
+                    if(rand(0,15) == 0){
+                        $position = $pos->add(0,1,0);
+                    }
+                    $tempPos = $position->add(0,0,$z);
+                    $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($tempPos, $level, $blockData,$player,"GroundBadabum",$this->destroytime, "dig.grass"), $tick);
+                    $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($tempPos, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+                    $tempPos = $position->add(0,0,-$z);
+                    $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($tempPos, $level, $blockData,$player,"GroundBadabum",$this->destroytime, "dig.grass"), $tick);
+                    $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($tempPos, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+                }else{
+                    if(rand(0,15) == 0){
+                        $position = $pos->add(0,1,0);
+                    }
+                    $tempPos = $position->add($z,0,0);
+                    $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($tempPos, $level, $blockData,$player,"GroundBadabum",$this->destroytime, "dig.grass"), $tick);
+                    $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($tempPos, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+                    $tempPos = $position->add(-$z,0,0);
+                    $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($tempPos, $level, $blockData,$player,"GroundBadabum",$this->destroytime, "dig.grass"), $tick);
+                    $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($tempPos, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+                }
+
+            }
+        }
+
+
+        /*
         $tempZ = -1;
         for ($x = 2; $x <= $this->distance; $x++) {
             if ($tempZ < $this->width) {
@@ -80,6 +149,7 @@ class GroundBadabum
 
 
         }
+        */
 
     }
 

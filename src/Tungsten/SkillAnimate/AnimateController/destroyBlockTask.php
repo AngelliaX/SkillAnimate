@@ -34,6 +34,7 @@ class destroyBlockTask extends Task
 
     public function onRun($tick)
     {
+
         if($this->level->getBlock($this->pos)->getId() != $this->blockData[0] or $this->level->getBlock($this->pos)->getDamage() != $this->blockData[1]){
             return;
         }
