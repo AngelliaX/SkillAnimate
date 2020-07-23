@@ -2,44 +2,63 @@
 
 namespace Tungsten\SkillAnimate\Events;
 
-use pocketmine\event\Event;
 use pocketmine\event\Cancellable;
-use pocketmine\level\Level;
-use pocketmine\math\Vector3;
+use pocketmine\event\Event;
 use pocketmine\Player;
+use pocketmine\scheduler\Task;
 use Tungsten\SkillAnimate\SkillAnimate;
 
-class SkillCollideEvent extends Event implements Cancellable{
+class SkillCollideEvent extends Event implements Cancellable
+{
     private $sa;
     /** @var Player */
     private $player;
     /** @var Player */
-    public $skillOwner;
+    private $skillOwner;
     /** @var string */
-    public $skillName;
-	public function __construct(SkillAnimate $sa,Player $skillOwner,Player $player,string $skillName){
+    private $skillName;
+    /** @var Task|null  */
+    private $spawnTask;
+    /** @var Task|null  */
+    private $personalTask;
+    public function __construct(SkillAnimate $sa, Player $skillOwner, Player $player, string $skillName, Task $spawnTask = null, Task $personalTask = null)
+    {
 
-		$this->sa = $sa;
-		$this->skillOwner = $skillOwner;
-		$this->player = $player;
-		$this->skillName = $skillName;
-	}
+        $this->sa = $sa;
+        $this->skillOwner = $skillOwner;
+        $this->player = $player;
+        $this->skillName = $skillName;
+        $this->spawnTask = $spawnTask;
+        $this->personalTask = $personalTask;
+    }
 
     /**
      * @return Player
      * return Player that collide to the skill
      */
-	public function getPlayer(){
-	    return $this->player;
+    public function getPlayer()
+    {
+        return $this->player;
     }
 
     /**
      * @return Player that execute the skill
      */
-    public function getSkillOwner(){
-	    return $this->skillOwner;
+    public function getSkillOwner()
+    {
+        return $this->skillOwner;
     }
-    public function getSkillName(){
+
+    public function getSkillName()
+    {
         return $this->skillName;
+    }
+
+    public function getSpawnTask() : ?Task {
+        return $this->spawnTask;
+    }
+
+    public function getPersonalTask() : ?Task {
+        return $this->personalTask;
     }
 }

@@ -10,7 +10,10 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use Tungsten\SkillAnimate\Database\YamlDatabase;
 use Tungsten\SkillAnimate\EventListener\MainEventListener;
-use Tungsten\SkillAnimate\EventListener\SkillListener;
+use Tungsten\SkillAnimate\EventListener\ChakraGenerateListener;
+use Tungsten\SkillAnimate\EventListener\SkillCollideListener;
+use Tungsten\SkillAnimate\EventListener\SkillExecuteListener;
+use Tungsten\SkillAnimate\EventListener\SkillOnHandListener;
 use Tungsten\SkillAnimate\RepeatingTask\showingChakraTask;
 use Tungsten\SkillAnimate\SkillContainer\GaraProtection;
 
@@ -23,7 +26,7 @@ class SkillAnimate extends PluginBase implements Listener
     /** @var  */
     public static $instance;
     public $pvpWorldName = "world";
-    public $skillIdItem = [500,501,502];
+    public $skillIdItem = [500,501,502,503,504,505];
 
     public $database;
     public $skillData;
@@ -32,10 +35,18 @@ class SkillAnimate extends PluginBase implements Listener
         $this->database = new YamlDatabase($this);
         $this->saveResource("skillData.yml");
         $this->skillData = new Config($this->getDataFolder()."skillData.yml");
+
         $listener = new MainEventListener($this);
         $this->getServer()->getPluginManager()->registerEvents($listener, $this);
-        $listener = new SkillListener($this);
+        $listener = new ChakraGenerateListener($this);
         $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        $listener = new SkillCollideListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        $listener = new SkillExecuteListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        $listener = new SkillOnHandListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        $this->getScheduler()->scheduleRepeatingTask($listener,1);
 
         self::$instance = $this;
         $task = new showingChakraTask($this);

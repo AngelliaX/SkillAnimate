@@ -51,6 +51,45 @@ class SoulHand extends Task
         $tick -= $this->oneRoundSpeed*$this->howManyTimeCheck;
         if($tick <= $this->oneRoundSpeed /4){
             $endTime = $this->oneRoundSpeed /4 - $tick;
+
+        }else if($tick <= $this->oneRoundSpeed/4 *3){
+            $endTime = $this->oneRoundSpeed/4*4 - $tick; //đỡ phải lặp lại trong else if ở dưới
+            $this->callTaskParallel([3,0,0],$endTime);
+            $this->callTaskParallel([3,0,2],$endTime);
+
+            $this->callTaskParallel([1,0,3],$endTime);
+
+            $this->callTaskParallel([-1,0,3],$endTime);
+
+            $this->callTaskParallel([-3,0,0],$endTime);
+            $this->callTaskParallel([-3,0,2],$endTime);
+        }else if($tick < $this->oneRoundSpeed/4 *4){
+            $endTime = $this->oneRoundSpeed/4*4 - $tick;
+            $this->callTaskParallel([3,1,0],$endTime);
+            $this->callTaskParallel([3,1,2],$endTime);
+
+            $this->callTaskParallel([1,1,3],$endTime);
+
+            $this->callTaskParallel([-1,1,3],$endTime);
+
+            $this->callTaskParallel([-3,1,0],$endTime);
+            $this->callTaskParallel([-3,1,2],$endTime);
+
+        }else{
+            $this->howManyTimeCheck++;
+        }
+    }
+
+    // Tự biến đổi cho mỗi skill
+    public function callTaskParallel(array $xyz,?int$endTime,string $sound = null){
+        $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
+        $this->sa->getScheduler()->scheduleRepeatingTask(new spawnBlockRepeatingTask($this->sa,[$xyz[0],$xyz[1],$xyz[2]],$this->player,$blockData,$endTime,"SoulHand","dig.grass",1),1);
+        $this->sa->getScheduler()->scheduleRepeatingTask(new spawnBlockRepeatingTask($this->sa,[$xyz[0],$xyz[1],-$xyz[2]],$this->player,$blockData,$endTime,"SoulHand","dig.grass",1),1);
+    }
+
+    /*luu tru skill cu
+     if($tick <= $this->oneRoundSpeed /4){
+            $endTime = $this->oneRoundSpeed /4 - $tick;
             $this->callTaskParallel([-1,1,-1],$endTime);
 
             $this->callTaskParallel([0,2,-2],$endTime);
@@ -103,13 +142,5 @@ class SoulHand extends Task
         }else{
             $this->howManyTimeCheck++;
         }
-    }
-
-    // Tự biến đổi cho mỗi skill
-    public function callTaskParallel(array $xyz,?int$endTime,string $sound = null){
-        $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
-        $this->sa->getScheduler()->scheduleRepeatingTask(new spawnBlockRepeatingTask($this->sa,[$xyz[0],$xyz[1],$xyz[2]],$this->player,$blockData,$endTime,"SoulHand","dig.grass",2),1);
-        $this->sa->getScheduler()->scheduleRepeatingTask(new spawnBlockRepeatingTask($this->sa,[$xyz[0],$xyz[1],-$xyz[2]],$this->player,$blockData,$endTime,"SoulHand","dig.grass",2),1);
-    }
-
+     */
 }

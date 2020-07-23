@@ -1,15 +1,33 @@
+#luong dmg de mat het 10 cuc mau khi ko co giap la 20
 GaraProtection:
+  chakra: 30
   destroyTime: 100
-  distance: 1
+  distance: 0.25 #distance nay khac distance ccua groundbadabum
   radius: 5
   effect: 1
 GroundBadabum:
-  distance: 30
+  chakra: 40
+  distance: 15
   width: 4
   destroyTime: 100
-  damage: 1
-SoulHand:
-  endTime: 200
-  oneRoundSpeed: 40
   damage: 2
+SoulHand:
+  chakra: 50
+  endTime: 200
+  oneRoundSpeed: 20
+  damage: 3
   effect: 1
+WispsSpawner:
+  chakra: 50
+  endTime: 400
+  distance: 0.5
+  radius: 10 #must be integer
+  amount: 10
+  damage: 3
+  small:
+    damage: 5
+StickyFluid:
+  chakra: 30
+  endTime : 400 #10secs
+  distance : 0.5
+  radius: 2

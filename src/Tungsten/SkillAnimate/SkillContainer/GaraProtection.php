@@ -16,7 +16,7 @@ class GaraProtection
     private $destroyTime;
     private $distance;
     private $radius;
-    public function __construct(SkillAnimate $sa, Player $player,int $destroyTime = null,int $distance = null,int $radius = null)
+    public function __construct(SkillAnimate $sa, Player $player)
     {
 
         if(!is_null($config = $sa->database->getConfig($player)->getNested("GaraProtection"))){

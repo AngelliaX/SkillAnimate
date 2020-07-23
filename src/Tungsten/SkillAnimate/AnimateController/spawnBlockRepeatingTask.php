@@ -29,7 +29,7 @@ class spawnBlockRepeatingTask extends Task
     private $distanceForPersonalTask;
     private $skillName;
 
-    public function __construct(SkillAnimate $sa, array $xyz, Player $player, array $blockData, int $endTime, string $skillName, string $sound = null, int $distance = 1)
+    public function __construct(SkillAnimate $sa, array $xyz, Player $player, array $blockData, int $endTime, string $skillName, string $sound = null, ?float $distance = 0.5)
     {
         $this->sa = $sa;
         $this->xyz = $xyz;
@@ -44,7 +44,7 @@ class spawnBlockRepeatingTask extends Task
 
     public function onRun($tick)
     {
-
+        /** vd endtime = 400 = 20s,tick = 1, => cu moi 1 tick timecheck se cong them 1,400 tick se du */
         if ($this->timeCheck++ > $this->endTime) {
             $this->sa->getScheduler()->cancelTask($this->getTaskId());
             return;
@@ -56,6 +56,7 @@ class spawnBlockRepeatingTask extends Task
         $z = $this->xyz[2];
         $pos = $this->posCorrection($direc, $player, $x, $y, $z);
         $level = $player->getLevel();
+        /** check if the player disconnect */
         if ($level == null) {
             $this->sa->getScheduler()->cancelTask($this->getTaskId());
             return;

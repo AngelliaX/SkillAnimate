@@ -12,6 +12,7 @@ class YamlDatabase{
     private $sa;
 
     /** Config $config */
+    /** players' config */
     private $config;
 	public function __construct(SkillAnimate $sa){
 		$this->sa = $sa;

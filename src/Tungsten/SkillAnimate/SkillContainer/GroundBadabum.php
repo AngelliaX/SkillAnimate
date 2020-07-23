@@ -58,6 +58,7 @@ class GroundBadabum
             if($i >= $this->distance - $this->width){
                 $tempZ--;
             }
+            //code nay se cong vao do dai 1 don vi sau moi vong lap
             $pos = $pos->add($unitVector);
 
             $position = 0;
@@ -66,14 +67,16 @@ class GroundBadabum
             }else{
                 $position = $pos;
             }
-
+            //Tam thoi dang quen chuc nang cua dong nay
             if(rand(0,15) == 0){
                 $position = $position->add($unitVector);
             }
-            $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];
 
+            $blockData = [(rand(0, 6) == 0) ? 1 : 1, 1];
+            //spawn 1 day 1block
             $sa->getScheduler()->scheduleDelayedTask(new spawnBlockDelayedTask($position, $level, $blockData,$player,"GroundBadabum",$this->destroytime,"dig.grass"), $tick);
             $sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($position, $level, $blockData, "dig.grass"), $tick + $this->destroytime);
+            //spawn be ngang
             $position = $pos;
             for ($z = 0; $z <= $tempZ; $z++) {
                 $position = $pos;
