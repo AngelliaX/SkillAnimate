@@ -40,6 +40,8 @@ class MainEventListener implements Listener
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillExecuteEvent($this->sa,$player,"WispsSpawner"));
         }else if ($ev->getItem()->getId() == 504) {
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillExecuteEvent($this->sa,$player,"StickyFluid"));
+        }else if ($ev->getItem()->getId() == 505) {
+            $this->sa->getServer()->getPluginManager()->callEvent(new SkillExecuteEvent($this->sa,$player,"ChasingFluid"));
         }
 
     }
@@ -58,7 +60,7 @@ class MainEventListener implements Listener
             if($id == 504){
                 $this->sa->getServer()->getPluginManager()->callEvent(new SkillOnHandEvent($this->sa,$player,"StickyFluid"));
             }if($id == 505){
-                //ChasingFluid
+                $this->sa->getServer()->getPluginManager()->callEvent(new SkillOnHandEvent($this->sa,$player,"ChasingFluid"));
 
             }
         }

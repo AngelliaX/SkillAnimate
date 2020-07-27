@@ -24,7 +24,7 @@ class YamlDatabase{
 	        $config = new Config($this->sa->getDataFolder()."player/"."$name.yml");
 	        $config->setNested("Chakra",300);
 	        $config->setNested("maxChakra",300);
-	        $config->setNested("ChakraHealPerSec",3);
+	        $config->setNested("ChakraHealPerSec",0.05);
 	        $this->config[$name] = $config;
 	        return;
         }

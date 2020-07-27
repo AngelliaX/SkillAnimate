@@ -40,14 +40,13 @@ class StickyFluid
 
     private function spawnParticle(SkillAnimate $sa, Player $player): void
     {
-        //TODO finish this function
         $level = $player->getLevel();
         $closest = "§cNo Target"; //string or player object
         $lastSquare = 900; //this is also the range,30 block
         foreach ($player->getLevel()->getPlayers() as $target) { // for every player in the sender's world
             if ($target->getName() != $player->getName()) {
                 $square = $player->distanceSquared($target);
-                if ($lastSquare > $square) {
+                if ($lastSquare >= $square) {
                     $closest = $target;
                     $lastSquare = $square;
                 }
@@ -63,7 +62,7 @@ class StickyFluid
             $tempC = $player;
             $lastSquare = 9;
         }
-        //3block se mat 1s de toi muc tieu
+        //7block se mat 1s de toi muc tieu
         $time = (int)round((20 / 7) * sqrt($lastSquare));
         if ($closest instanceof Player) {
             $this->particleFromVectorAtoB($player, $level, $tempP, $tempC, $time);
@@ -79,9 +78,9 @@ class StickyFluid
 
         $timeToExecute2 = 20; #0.5secs to display a fully circle
         if ($closest instanceof Player) {
-            $this->particleCircle($closest, $timeToExecute2, $time + $timeToExecute);
+            $this->particleCircle($player,$closest, $timeToExecute2, $time + $timeToExecute);
         } else {
-            $this->particleCircle($player, $timeToExecute2, $time + $timeToExecute);
+            $this->particleCircle($player,$player, $timeToExecute2, $time + $timeToExecute);
         }
 
     }
@@ -121,7 +120,6 @@ class StickyFluid
         }
     }
 
-    /**  thuat toan de tao ra cac particle noi tu 1 pos toi pplayer*/
 
     private function frand($min, $max, $decimals = 0): float
     {
@@ -148,7 +146,7 @@ class StickyFluid
         return $y;
     }
 
-    private function particleCircle(Player $target, int $time, int $bonusTime)
+    private function particleCircle(Player $skillOwner,Player $target, int $time, int $bonusTime)
     {
         $y = $this->getYofBlockUnder($target);
         $timeToExecute2 = $time;
@@ -164,7 +162,10 @@ class StickyFluid
                 $x = cos($i) * $r;
                 $z = sin($i) * $r;
                 $tempTime = (int)(($timeToExecute2 / $totalParticle) * $tempParticle + 1); //+1 for the case 0.xxxx
-                $this->sa->getScheduler()->scheduleDelayedRepeatingTask(new spawnParticleRepeatingTask($this->sa, [$x, $y, $z], $target, Particle::TYPE_SPARKLER, $this->endTime, "StickyFluid", "liquid.water", $this->distance, false, true, true, [rand(0, 81), rand(0, 247), rand(235, 255)],1), (int)$tempTime + $bonusTime, 30);
+                $correctX = $target->x - $skillOwner->x;
+                $correctY = $target->y - $skillOwner->y;
+                $correctZ = $target->z - $skillOwner->z;
+                $this->sa->getScheduler()->scheduleDelayedRepeatingTask(new spawnParticleRepeatingTask($this->sa, [$x +$correctX, $y+$correctY, $z+$correctZ], $skillOwner, Particle::TYPE_SPARKLER, $this->endTime, "StickyFluid", "liquid.water", $this->distance, false, true, true, [rand(0, 81), rand(0, 247), rand(235, 255)],1), (int)$tempTime + $bonusTime, 30);
             }
         }
     }

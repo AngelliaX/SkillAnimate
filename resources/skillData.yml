@@ -1,22 +1,26 @@
 #luong dmg de mat het 10 cuc mau khi ko co giap la 20
+#tat ca dai luong tgian deu tinh theo tick
 GaraProtection:
   chakra: 30
   destroyTime: 100
   distance: 0.25 #distance nay khac distance ccua groundbadabum
   radius: 5
   effect: 1
+  cooldown: 200
 GroundBadabum:
   chakra: 40
   distance: 15
   width: 4
   destroyTime: 100
   damage: 2
+  cooldown: 200
 SoulHand:
   chakra: 50
   endTime: 200
   oneRoundSpeed: 20
   damage: 3
   effect: 1
+  cooldown: 300
 WispsSpawner:
   chakra: 50
   endTime: 400
@@ -26,8 +30,13 @@ WispsSpawner:
   damage: 3
   small:
     damage: 5
+  cooldown: 200
 StickyFluid:
   chakra: 30
   endTime : 400 #10secs
   distance : 0.5
   radius: 2
+  cooldown: 200
+ChasingFluid:
+  cooldown: 200
+  chakra: 50

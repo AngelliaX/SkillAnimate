@@ -49,6 +49,8 @@ class SoulHand extends Task
         $level = $player->getLevel();
         //dong 0 nam 1  bac 3 tay 2
         $tick -= $this->oneRoundSpeed*$this->howManyTimeCheck;
+        //TODO task nay chay nhieu task qua, cho no chay 1 lan thoi
+        //TODO trong if else cho them code neu da chay r thi stop
         if($tick <= $this->oneRoundSpeed /4){
             $endTime = $this->oneRoundSpeed /4 - $tick;
 

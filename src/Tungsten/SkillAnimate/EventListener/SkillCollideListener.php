@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Tungsten\SkillAnimate\EventListener;
 
+use pocketmine\entity\Effect;
+use pocketmine\entity\EffectInstance;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
@@ -82,7 +84,22 @@ class SkillCollideListener implements Listener
             }
             $player->attack($ev);
         }else if($ev->getSkillName() == "StickyFluid"){
-            
+            if($player->getName() == $skillOwner->getName()){
+                if(!$player->hasEffect(16) or !$player->hasEffect(1) or !$player->hasEffect(10)){
+                    $player->addEffect(new EffectInstance(Effect::getEffect(16),60,1));
+                    $player->addEffect(new EffectInstance(Effect::getEffect(1),60,1));
+                    $player->addEffect(new EffectInstance(Effect::getEffect(10),60,2));
+                }
+            }else{
+                if(!$player->hasEffect(2) or !$player->hasEffect(9)){
+                    $player->addEffect(new EffectInstance(Effect::getEffect(2),20,4,false));
+                    $player->addEffect(new EffectInstance(Effect::getEffect(9),20,1,false));
+                }
+            }
+        }else if($ev->getSkillName() == "ChasingFluid"){
+            $this->spawnParticle($player, Particle::TYPE_HUGE_EXPLODE);
+            $this->spawnParticle($player, Particle::TYPE_HUGE_EXPLODE);
+            $this->playMusic($player, "random.explode");
         }
     }
 

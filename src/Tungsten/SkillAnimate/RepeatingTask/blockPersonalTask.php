@@ -71,7 +71,9 @@ class blockPersonalTask extends Task
                 continue;
             }
             if ($player->getName() == $this->skillOwner->getName()) {
-                #continue;
+                if($this->skillName != "StickyFluid"){
+                    continue;
+                }
             }
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillCollideEvent($this->sa, $this->skillOwner, $player, $this->skillName,$this->spawnTask,$this));
         }

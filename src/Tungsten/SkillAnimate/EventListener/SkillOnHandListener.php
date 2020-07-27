@@ -37,22 +37,25 @@ class SkillOnHandListener extends Task implements Listener
             foreach ($holder->getLevel()->getPlayers() as $p) { // for every player in the sender's world
                 if ($p !== $holder) {
                     $square = $holder->distanceSquared($p);
-                    #var_dump($square);
-                    if ($lastSquare > $square) {
+                    var_dump(sqrt($square));
+                    if ($lastSquare >= $square) {
                         $closest = $p;
                         $lastSquare = $square;
                     }
                 }
             }
             if ($holder->getInventory()->getItemInHand()->getId() == 504) { //StickyFluid
-                if ($holder instanceof Player)
                     if (!$closest instanceof Player) {
                         $holder->sendTip("Target: §6". $closest);
                         return;
                     }
                 $holder->sendTip("Target: §6" . $closest->getName());
             } else if ($holder->getInventory()->getItemInHand()->getId() == 505) { //ChasingFluid
-
+                if (!$closest instanceof Player) {
+                    $holder->sendTip("Target: §6". $closest);
+                    return;
+                }
+                $holder->sendTip("Target: §6" . $closest->getName());
             } else {
                 unset($this->listplayersName[array_search($holderName, $this->listplayersName)]);
             }
