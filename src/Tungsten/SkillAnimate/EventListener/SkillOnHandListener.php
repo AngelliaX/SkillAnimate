@@ -37,7 +37,7 @@ class SkillOnHandListener extends Task implements Listener
             foreach ($holder->getLevel()->getPlayers() as $p) { // for every player in the sender's world
                 if ($p !== $holder) {
                     $square = $holder->distanceSquared($p);
-                    var_dump(sqrt($square));
+                    #var_dump(sqrt($square));
                     if ($lastSquare >= $square) {
                         $closest = $p;
                         $lastSquare = $square;

@@ -25,7 +25,7 @@ class ChasingFluid extends Task
     private $checkTick = 0;
     private $howManyTimeCheck = 0;
 
-    private $speed = 0.1; //0.5block/5tick  => 2block/1s
+    private $speed = 0.35; //0.5block/5tick  => 2block/1s
     private $nowPos;
     private $countTime;
 
@@ -51,7 +51,7 @@ class ChasingFluid extends Task
     {
         //code only run every 5tick
         $this->countTime += $this->getHandler()->getPeriod();
-        if($this->countTime < 1){
+        if($this->countTime < 2){
             return;
         }else{
             $this->countTime = 0;
@@ -62,6 +62,15 @@ class ChasingFluid extends Task
         $tempX = (($target->x - $nowPos->x)>0) ? $this->speed: -$this->speed;
         $tempY = ((($target->y+1) - $nowPos->y)>0) ? $this->speed: -$this->speed;
         $tempZ = (($target->z - $nowPos->z)>0)? $this->speed: -$this->speed;
+        if(abs($target->x - $nowPos->x) < $this->speed){
+            $tempX = 0;
+        }
+        if(abs(($target->y+1) - $nowPos->y) < $this->speed){
+            $tempY = 0;
+        }
+        if(abs($target->z - $nowPos->z) < $this->speed){
+            $tempZ = 0;
+        }
 
         $nowPos = $nowPos->add($tempX,$tempY,$tempZ);
         $this->nowPos = $nowPos;
@@ -73,9 +82,25 @@ class ChasingFluid extends Task
             $this->getHandler()->cancel();
             $this->sa->getServer()->getPluginManager()->callEvent(new SkillCollideEvent($this->sa, $this->player, $this->target, "ChasingFluid"));
         }
+        $signX = $this->sign($tempX);
+        $signY = $this->sign($tempY);
+        $signZ = $this->sign($tempZ);
+        for ($r = 0; $r <= 0.25; $r += 0.25) {
+            $amount = ($r * 30) + 1;
+            for ($i = pi(); $i <= 3 * pi(); $i += 2 * pi() / $amount) {
+                $x = cos($i) * $r;
+                $z = sin($i) * $r;
+                $target->getLevel()->addParticle(new GenericParticle($nowPos->add(($x-1.25)*$signX,($z),($x-1.25)*$signZ),Particle::TYPE_SPARKLER,((255 & 0xff) << 24) | ((rand(0, 81) & 0xff) << 16) | ((rand(0, 247) & 0xff) << 8) | ( rand(235, 255) & 0xff)));
+            }
+        }
+
+        $target->getLevel()->addParticle(new GenericParticle($nowPos->add(-0.25*$signX,0,-0.25*$signZ),Particle::TYPE_SPARKLER,((255 & 0xff) << 24) | ((rand(0, 81) & 0xff) << 16) | ((rand(0, 247) & 0xff) << 8) | ( rand(235, 255) & 0xff)));
         $target->getLevel()->addParticle(new GenericParticle($nowPos,Particle::TYPE_SPARKLER,((255 & 0xff) << 24) | ((rand(0, 81) & 0xff) << 16) | ((rand(0, 247) & 0xff) << 8) | ( rand(235, 255) & 0xff)));
     }
 
+    private function sign ($num){
+        return (($num > 0) - ($num < 0));
+    }
     public function callTaskParallel(array $xyz, ?int $endTime, string $sound = null)
     {
         $blockData = [(rand(0, 6) == 0) ? 179 : 24, 15];

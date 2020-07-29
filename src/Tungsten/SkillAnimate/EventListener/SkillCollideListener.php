@@ -78,8 +78,7 @@ class SkillCollideListener implements Listener
                 $ev = new EntityDamageByEntityEvent($skillOwner, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $config->getNested($ev->getSkillName().".damage"));
             } else {
                 $config = $this->sa->skillData->getNested($ev->getSkillName().".damage");
-                var_dump($config);
-                $ev = new EntityDamageByEntityEvent($skillOwner, $player, EntityDamageEvent::CAUSE_CONTACT, $config);
+                $ev = new EntityDamageByEntityEvent($skillOwner, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, $config);
 
             }
             $player->attack($ev);
@@ -97,6 +96,8 @@ class SkillCollideListener implements Listener
                 }
             }
         }else if($ev->getSkillName() == "ChasingFluid"){
+            $ev = new EntityDamageByEntityEvent($skillOwner, $player, EntityDamageEvent::CAUSE_ENTITY_ATTACK, 10);
+            $player->attack($ev);
             $this->spawnParticle($player, Particle::TYPE_HUGE_EXPLODE);
             $this->spawnParticle($player, Particle::TYPE_HUGE_EXPLODE);
             $this->playMusic($player, "random.explode");

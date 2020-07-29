@@ -45,9 +45,9 @@ class SkillExecuteListener implements Listener
         $lastSquare = 900; //this is also the range,30 block
         foreach ($player->getLevel()->getPlayers() as $target) { // for every player in the sender's world
             if ($target->getName() != $player->getName()) {
-                $closest = $target;
                 $square = $player->distanceSquared($target);
                 if ($lastSquare >= $square) {
+                    $closest = $target;
                     $lastSquare = $square;
                 }
             }
@@ -58,7 +58,6 @@ class SkillExecuteListener implements Listener
     {
         $skillName = $ev->getSkillName();
         $player = $ev->getPlayer();
-
         $chasingFluidCheck = "lol";
         if($skillName == "ChasingFluid"){
             $chasingFluidCheck = $this->checkChasingFluid($player);

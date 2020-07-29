@@ -5,6 +5,8 @@ namespace Tungsten\SkillAnimate;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
@@ -52,6 +54,12 @@ class SkillAnimate extends PluginBase implements Listener
         $task = new showingChakraTask($this);
         $this->getServer()->getPluginManager()->registerEvents($task,$this);
         $this->getScheduler()->scheduleRepeatingTask($task,1);
+
+        foreach($this->skillIdItem as $id){
+            ItemFactory::registerItem(new Item($id));
+            Item::addCreativeItem(Item::get($id));
+        }
+
     }
     public function onDisable()
     {

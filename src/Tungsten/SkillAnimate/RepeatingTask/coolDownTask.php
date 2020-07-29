@@ -30,7 +30,7 @@ class coolDownTask extends Task
         if($this->timeLeft <=0 ){
             $this->getHandler()->cancel();
             unset($this->sel->coolDown[$this->player->getName()."_".$this->skillName]);
-            $this->player->sendTip("§c".$this->skillName."§f da san sang");
+            $this->player->sendPopup("§c".$this->skillName."§f da san sang");
             $this->playMusic($this->player,"random.toast");
         }
     }
