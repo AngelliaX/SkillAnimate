@@ -35,6 +35,8 @@ class SoulHand extends Task
             $this->oneRoundSpeed =  $config["oneRoundSpeed"];
         }
     }
+    //look like [true,false,false] for each statemant in the if else inside onRun()
+    private $isRun = [false,false,false];
     public function onRun($tick){
         if($this->checkTick == 0){
             $this->checkTick = $tick;
@@ -52,31 +54,42 @@ class SoulHand extends Task
         //TODO task nay chay nhieu task qua, cho no chay 1 lan thoi
         //TODO trong if else cho them code neu da chay r thi stop
         if($tick <= $this->oneRoundSpeed /4){
-            $endTime = $this->oneRoundSpeed /4 - $tick;
-
+            //this is also means do nothing
+            if(!$this->isRun[0]) {
+                $this->isRun[0] = true;
+                $this->isRun[1] = false;
+                $endTime = $this->oneRoundSpeed / 4 - $tick;
+            }
         }else if($tick <= $this->oneRoundSpeed/4 *3){
-            $endTime = $this->oneRoundSpeed/4*4 - $tick; //đỡ phải lặp lại trong else if ở dưới
-            $this->callTaskParallel([3,0,0],$endTime);
-            $this->callTaskParallel([3,0,2],$endTime);
+            if(!$this->isRun[1]){
+                $this->isRun[1] = true;
+                $this->isRun[2] = false;
+                $endTime = $this->oneRoundSpeed/4*4 - $tick; //đỡ phải lặp lại trong else if ở dưới
+                $this->callTaskParallel([3,0,0],$endTime);
+                $this->callTaskParallel([3,0,2],$endTime);
 
-            $this->callTaskParallel([1,0,3],$endTime);
+                $this->callTaskParallel([1,0,3],$endTime);
 
-            $this->callTaskParallel([-1,0,3],$endTime);
+                $this->callTaskParallel([-1,0,3],$endTime);
 
-            $this->callTaskParallel([-3,0,0],$endTime);
-            $this->callTaskParallel([-3,0,2],$endTime);
+                $this->callTaskParallel([-3,0,0],$endTime);
+                $this->callTaskParallel([-3,0,2],$endTime);
+            }
         }else if($tick < $this->oneRoundSpeed/4 *4){
-            $endTime = $this->oneRoundSpeed/4*4 - $tick;
-            $this->callTaskParallel([3,1,0],$endTime);
-            $this->callTaskParallel([3,1,2],$endTime);
+            if(!$this->isRun[2]){
+                $this->isRun[2] = true;
+                $this->isRun[0] = false;
+                $endTime = $this->oneRoundSpeed/4*4 - $tick;
+                $this->callTaskParallel([3,1,0],$endTime);
+                $this->callTaskParallel([3,1,2],$endTime);
 
-            $this->callTaskParallel([1,1,3],$endTime);
+                $this->callTaskParallel([1,1,3],$endTime);
 
-            $this->callTaskParallel([-1,1,3],$endTime);
+                $this->callTaskParallel([-1,1,3],$endTime);
 
-            $this->callTaskParallel([-3,1,0],$endTime);
-            $this->callTaskParallel([-3,1,2],$endTime);
-
+                $this->callTaskParallel([-3,1,0],$endTime);
+                $this->callTaskParallel([-3,1,2],$endTime);
+            }
         }else{
             $this->howManyTimeCheck++;
         }

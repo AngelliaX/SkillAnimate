@@ -36,6 +36,7 @@ class spawnParticleRepeatingTask extends Task
     private $skipY;
     private $isTriggered = false;
 
+    private $constanceLevel;
     public function __construct(SkillAnimate $sa, array $xyz, Player $player, int $particleId, int $endTime, string $skillName, string $sound = null, ?float $distance = 0.5, bool $followPlayer = false, bool $skipY = false, bool $skipCorrectPos = false, ?array $rgb = [255, 0, 0], ?int $howManyPar = 1)
     {
         $this->sa = $sa;
@@ -52,7 +53,7 @@ class spawnParticleRepeatingTask extends Task
         $this->howManyPar = $howManyPar;
 
         $this->skipY = $skipY;
-
+        $this->constanceLevel = $player->getLevel();
         $direc = $player->getDirection();
         $x = $xyz[0];
         $y = $xyz[1];
@@ -61,6 +62,7 @@ class spawnParticleRepeatingTask extends Task
         if (!$skipCorrectPos) {
             $this->constantPos = $this->posCorrection($direc, $player, $x, $y, $z);
         }
+        //If player disconnected, $level return null
         if (($level = $player->getLevel()) == null) {
             $this->sa->getScheduler()->cancelTask($this->getTaskId());
             return;
@@ -102,7 +104,7 @@ class spawnParticleRepeatingTask extends Task
         $level = $this->player->getLevel();
 
         if (!$this->followPlayer and !$this->isTriggered) {
-            $task = new blockPersonalTask($this->sa, $this->player, $this->constantPos, $level, $this->skillName, $this->endTime, $this->distanceForPersonalTask, $this->skipY, $this);
+            $task = new blockPersonalTask($this->sa, $this->player, $this->constantPos, $this->constanceLevel, $this->skillName, $this->endTime, $this->distanceForPersonalTask, $this->skipY, $this);
             $this->sa->getScheduler()->scheduleRepeatingTask($task, 1);
             $this->isTriggered = true;
         }
@@ -133,8 +135,6 @@ class spawnParticleRepeatingTask extends Task
         if ($level->getBlock($pos)->getId() != 0) {
             return;
         }
-        #var_dump($pos);
-        #var_dump("call");
         for ($i = 1; $i <= $this->howManyPar; $i++) {
             $level->addParticle(new GenericParticle($pos, $this->particleId, ((255 & 0xff) << 24) | (($this->rgb[0] & 0xff) << 16) | (($this->rgb[1] & 0xff) << 8) | ($this->rgb[2] & 0xff)));
         }

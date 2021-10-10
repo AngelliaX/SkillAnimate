@@ -3,5 +3,4 @@ version: 1.0.1
 main: Tungsten\SkillAnimate\SkillAnimate
 api: 3.0.0
 author: Tungsten
-commands:
  

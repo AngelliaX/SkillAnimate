@@ -31,7 +31,10 @@ class YamlDatabase{
 	    $this->config[$name] = new Config($this->sa->getDataFolder()."player/"."$name.yml");
     }
     public function getConfig(Player $player) : Config{
-	    return $this->config[$player->getName()];
+	    if(!isset($this->config[$player->getName()])){
+			$this->addConfig($player);
+		}
+		return $this->config[$player->getName()];
     }
     public function saveConfig(Player $player){
 	    $name = $player->getName();

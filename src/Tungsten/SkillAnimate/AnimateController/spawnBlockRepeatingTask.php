@@ -39,6 +39,27 @@ class spawnBlockRepeatingTask extends Task
         $this->endTime = $endTime;
         $this->distanceForPersonalTask = $distance;
         $this->skillName = $skillName;
+
+        if ($this->sound != null) {
+            $sound = new PlaySoundPacket();
+            $x = $player->getX();
+            $z = $player->getZ();
+            $sound->x = $x;
+            $sound->y = $player->getY();
+            $sound->z = $z;
+            $sound->volume = 100;
+            $sound->pitch = 1;
+            $sound->soundName = $this->sound;
+            if($player->getLevel() == null){
+                $this->getHandler()->cancel();
+            }
+            foreach ($player->getLevel()->getPlayers() as $player) {
+                if (abs($player->getX()) <= $x + 100 && abs($player->getZ()) <= $z + 100) {
+                    SkillAnimate::$instance->getServer()->broadcastPacket([$player], $sound);
+                }
+            }
+
+        }
     }
 
 
@@ -62,33 +83,13 @@ class spawnBlockRepeatingTask extends Task
             return;
         }
 
+        $task = new blockPersonalTask($this->sa, $this->player, $pos, $level, $this->skillName, 1, $this->distanceForPersonalTask);
+        $this->sa->getScheduler()->scheduleRepeatingTask($task, 1);
         if ($level->getBlock($pos)->getId() != 0) {
             return;
         }
-
-        $task = new blockPersonalTask($this->sa, $this->player, $pos, $level, $this->skillName, 4, $this->distanceForPersonalTask);
-        $this->sa->getScheduler()->scheduleRepeatingTask($task, 1);
         $level->setBlock($pos, Block::get($this->blockData[0], $this->blockData[1]), false, false);
-        $this->sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($pos, $level, $this->blockData), 4);
-
-
-        if ($this->sound != null) {
-            $sound = new PlaySoundPacket();
-            $x = $player->getX();
-            $z = $player->getZ();
-            $sound->x = $x;
-            $sound->y = $player->getY();
-            $sound->z = $z;
-            $sound->volume = 100;
-            $sound->pitch = 1;
-            $sound->soundName = $this->sound;
-            foreach ($level->getPlayers() as $player) {
-                if (abs($player->getX()) <= $x + 100 && abs($player->getZ()) <= $z + 100) {
-                    SkillAnimate::$instance->getServer()->broadcastPacket([$player], $sound);
-                }
-            }
-
-        }
+        $this->sa->getScheduler()->scheduleDelayedTask(new destroyBlockTask($pos, $level, $this->blockData), 5);
     }
 
     public function PosCorrection(int $direc, Vector3 $pos, int $x, int $y, int $z): Vector3
